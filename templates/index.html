@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Temperature Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body{
+            background:#0f172a;
+            color:white;
+            font-family:Arial,sans-serif;
+            text-align:center;
+            padding:20px;
+        }
+
+        .card{
+            background:#1e293b;
+            border-radius:15px;
+            padding:20px;
+            margin:10px auto;
+            width:350px;
+        }
+
+        #temp{
+            font-size:48px;
+            font-weight:bold;
+        }
+
+        #status{
+            font-size:24px;
+        }
+
+        canvas{
+            background:white;
+            border-radius:10px;
+            margin-top:20px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Temperature Monitoring Dashboard</h1>
+
+<div class="card">
+    <h3>Candidate</h3>
+    <p>Ganwa Anne Laure</p>
+</div>
+
+<div class="card">
+    <h3>Current Temperature</h3>
+    <div id="temp">-- °C</div>
+</div>
+
+<div class="card">
+    <h3>Status</h3>
+    <div id="status">Waiting...</div>
+</div>
+
+<canvas id="chart" width="900" height="350"></canvas>
+
+<script>
+const tempElement = document.getElementById("temp");
+const statusElement = document.getElementById("status");
+
+const ctx = document.getElementById("chart").getContext("2d");
+
+const chart = new Chart(ctx,{
+    type:'line',
+    data:{
+        labels:[],
+        datasets:[{
+            label:'Temperature (°C)',
+            data:[]
+        }]
+    },
+    options:{
+        responsive:false
+    }
+});
+
+async function loadTemperature(){
+
+    const response = await fetch('/temperature');
+    const data = await response.json();
+
+    tempElement.innerText = data.temperature + " °C";
+
+    let temp = parseFloat(data.temperature);
+
+    if(temp < 20){
+        statusElement.innerText = "COLD";
+    }
+    else if(temp <= 35){
+        statusElement.innerText = "NORMAL";
+    }
+    else{
+        statusElement.innerText = "HOT";
+    }
+
+    let time = new Date().toLocaleTimeString();
+
+    chart.data.labels.push(time);
+    chart.data.datasets[0].data.push(temp);
+
+    if(chart.data.labels.length > 20){
+        chart.data.labels.shift();
+        chart.data.datasets[0].data.shift();
+    }
+
+    chart.update();
+}
+
+setInterval(loadTemperature,1000);
+</script>
+
+</body>
+</html>

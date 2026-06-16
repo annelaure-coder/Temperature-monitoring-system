@@ -1,6 +1,6 @@
 # Temperature monitoring system: sensor -> Arduino -> LCD -> PC -> MQTT
 Names:GANWA Anne Laure
-
+Link to dashboard: http://157.173.101.159:8214/
 ## System architecture
 
 ![System architecture](architecture_diagram.svg)
